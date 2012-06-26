@@ -59,9 +59,13 @@ if __name__ == "__main__":
                 direction.write('out')
             segment_files[pin] = open("gpio%d/value" % pin, 'w')
 
-    for x in xrange(10):
-        display_digit(x)
-        sleep(0.5)
+    time = 0.50
+    while time >= 0:
+        for x in xrange(10):
+            display_digit(x)
+            sleep(time)
+        time -= 0.06
+
 
     with open('unexport', 'a') as unexport:
         for pin in PINS.itervalues():
