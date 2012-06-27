@@ -2,6 +2,7 @@
 
 import os
 from time import sleep
+import signal
 PINS = {
     'upper middle': 24,
     'upper left': 23,
@@ -49,6 +50,14 @@ def shadow_all():
     for segment in PINS.iterkeys():
         shadow_segment(segment)
 
+def cleanup():
+    with open('unexport', 'a') as unexport:
+        for pin in PINS.itervalues():
+            unexport.write(str(pin))
+            unexport.flush()
+            segment_files[pin].close()
+
+
 if __name__ == "__main__":
     os.chdir("/sys/class/gpio")
     with open('export', 'a') as export:
@@ -59,16 +68,12 @@ if __name__ == "__main__":
                 direction.write('out')
             segment_files[pin] = open("gpio%d/value" % pin, 'w')
 
-    time = 0.50
-    while time >= 0:
-        for x in xrange(10):
-            display_digit(x)
-            sleep(time)
-        time -= 0.06
+    try:
+        time = 0.20
+        while True:
+            for x in xrange(10):
+                display_digit(x)
+                sleep(time)
+    except KeyboardInterrupt:
+        cleanup()
 
-
-    with open('unexport', 'a') as unexport:
-        for pin in PINS.itervalues():
-            unexport.write(str(pin))
-            unexport.flush()
-            segment_files[pin].close()
