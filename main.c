@@ -114,6 +114,18 @@ void open_gpio_files() {
     segment_files[i] = NULL;
 }
 
+void close_gpio_files() {
+    int i;
+    FILE *gpio_file;
+    for (i=0; segment_files[i] != NULL; i++) {
+        gpio_file = segment_files[i];
+        if (fclose(gpio_file) == EOF) {
+            fprintf(stderr, "can't close segment file #%d\n", i);
+            perror(NULL);
+        }
+    }
+}
+
 void display_digit(int digit) {
     if (digit < 0 || digit > 9) {
         return;
@@ -154,6 +166,7 @@ int main(int argc, char** argv)
         display_digit(i);
         sleep(1);
     }
+    close_gpio_files();
     export_or_unexport(unexport);
 
 
